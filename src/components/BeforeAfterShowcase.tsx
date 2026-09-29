@@ -70,19 +70,28 @@ export const BeforeAfterShowcase: React.FC = () => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     let pos = ((clientX - rect.left) / rect.width) * 100;
-    if (pos < 5) pos = 5;
-    if (pos > 95) pos = 95;
+    if (pos < 2) pos = 2;
+    if (pos > 98) pos = 98;
     setSliderPosition(pos);
   }, []);
 
-  const handleMouseDown = () => { isDragging.current = true; };
-  const handleMouseUp = () => { isDragging.current = false; };
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging.current) handleMove(e.clientX);
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    isDragging.current = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    handleMove(e.clientX);
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    handleMove(e.touches[0].clientX);
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isDragging.current) {
+      handleMove(e.clientX);
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    isDragging.current = false;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {}
   };
 
   return (
@@ -154,14 +163,14 @@ export const BeforeAfterShowcase: React.FC = () => {
           {/* Drag Slider Container */}
           <div
             ref={containerRef}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            onMouseMove={handleMouseMove}
-            onTouchMove={handleTouchMove}
-            className="relative h-80 sm:h-96 rounded-xl overflow-hidden select-none cursor-ew-resize border border-white/10 shadow-2xl bg-[#090C12]"
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            className="relative h-80 sm:h-96 md:h-[420px] rounded-xl overflow-hidden select-none cursor-ew-resize border border-white/10 shadow-2xl bg-[#090C12] touch-none"
           >
             {/* BEFORE LAYER (Full background) */}
-            <div className="absolute inset-0 w-full h-full">
+            <div className="absolute inset-0 w-full h-full pointer-events-none">
               <img
                 src={activeCase.beforeImage}
                 alt={`Antes - ${activeCase.title}`}
@@ -180,38 +189,39 @@ export const BeforeAfterShowcase: React.FC = () => {
               </div>
             </div>
 
-            {/* AFTER LAYER (Clipped overlay) */}
+            {/* AFTER LAYER (Hardware-accelerated clipPath overlay - Zero squishing!) */}
             <div
-              className="absolute inset-y-0 left-0 border-r-2 border-[#C5A059] overflow-hidden z-10"
-              style={{ width: `${sliderPosition}%` }}
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
             >
-              <div
-                className="w-full h-full absolute left-0 top-0"
-                style={{ width: containerRef.current ? containerRef.current.clientWidth : '100%', height: '100%' }}
-              >
-                <img
-                  src={activeCase.afterImage}
-                  alt={`Depois - ${activeCase.title}`}
-                  className="w-full h-full object-cover object-center filter brightness-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/20" />
+              <img
+                src={activeCase.afterImage}
+                alt={`Depois - ${activeCase.title}`}
+                className="w-full h-full object-cover object-center filter brightness-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/20" />
 
-                <div className="absolute top-4 left-4 bg-[#C5A059]/30 backdrop-blur-md px-3 py-1 rounded text-[11px] font-mono font-semibold text-[#E9D5A1] border border-[#C5A059]/40 shadow-lg">
-                  DEPOIS: Lentes em Resina ({activeCase.tone})
-                </div>
+              <div className="absolute top-4 left-4 bg-[#C5A059]/30 backdrop-blur-md px-3 py-1 rounded text-[11px] font-mono font-semibold text-[#E9D5A1] border border-[#C5A059]/40 shadow-lg">
+                DEPOIS: Lentes em Resina ({activeCase.tone})
+              </div>
 
-                <div className="absolute bottom-4 inset-x-4 max-w-md mx-auto bg-[#10141D]/85 backdrop-blur-md p-3 rounded-lg border border-[#C5A059]/35 text-center">
-                  <p className="text-xs text-[#E9D5A1] font-medium">
-                    "{activeCase.afterDescription}"
-                  </p>
-                </div>
+              <div className="absolute bottom-4 inset-x-4 max-w-md mx-auto bg-[#10141D]/85 backdrop-blur-md p-3 rounded-lg border border-[#C5A059]/35 text-center">
+                <p className="text-xs text-[#E9D5A1] font-medium">
+                  "{activeCase.afterDescription}"
+                </p>
               </div>
             </div>
 
+            {/* SLIDER DIVIDER LINE */}
+            <div
+              className="absolute top-0 bottom-0 w-0.5 bg-[#C5A059] shadow-[0_0_12px_#C5A059] pointer-events-none z-20"
+              style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
+            />
+
             {/* SLIDER HANDLE */}
             <div
-              className="absolute top-0 bottom-0 z-20 flex items-center justify-center pointer-events-none"
-              style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
+              className="absolute top-1/2 z-20 flex items-center justify-center pointer-events-none -translate-y-1/2"
+              style={{ left: `${sliderPosition}%`, transform: 'translate(-50%, -50%)' }}
             >
               <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#C5A059] to-[#E9D5A1] text-[#090B0E] font-bold text-xs flex items-center justify-center shadow-xl shadow-[#C5A059]/60 border-2 border-white">
                 <ArrowLeftRight className="w-4 h-4 text-[#090B0E]" />

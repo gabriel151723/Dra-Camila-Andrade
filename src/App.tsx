@@ -57,7 +57,7 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
+    <div className={`min-h-screen w-full max-w-full overflow-x-clip transition-colors duration-300 ${
       theme === 'light' 
         ? 'theme-light bg-[#FAF8F5] text-[#1A202C]' 
         : 'bg-[#090B0E] text-[#F8FAFC]'

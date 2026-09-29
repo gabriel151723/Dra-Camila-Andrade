@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Phone, Menu, X, ArrowRight, MessageCircle, Instagram } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import draCamilaPhoto from '../assets/images/dra-camila.jpg';
 
 interface NavbarProps {
   onOpenBooking: () => void;
@@ -12,12 +13,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Synchronized avatar state with localStorage
-  const [customAvatar, setCustomAvatar] = useState<string | null>(() => {
+  // Synchronized avatar state with localStorage, defaulting to bundled high-res photo of Dra. Camila
+  const [customAvatar, setCustomAvatar] = useState<string>(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('dracamila_hero_photo');
+      const saved = localStorage.getItem('dracamila_hero_photo');
+      if (saved) return saved;
     }
-    return null;
+    return draCamilaPhoto;
   });
 
   useEffect(() => {
@@ -26,7 +28,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
       if (customEvent.detail) {
         setCustomAvatar(customEvent.detail);
       } else {
-        setCustomAvatar(localStorage.getItem('dracamila_hero_photo'));
+        const saved = localStorage.getItem('dracamila_hero_photo');
+        setCustomAvatar(saved || draCamilaPhoto);
       }
     };
     window.addEventListener('hero_photo_updated', handleSync);
@@ -101,20 +104,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
           {/* Handcrafted Luxury Monogram Insignia */}
           <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#1C2230] via-[#121620] to-[#0B0E14] border border-[#C5A059]/40 p-0.5 shadow-md shadow-[#C5A059]/10 group-hover:border-[#C5A059] group-hover:shadow-[0_0_15px_rgba(197,160,89,0.3)] transition-all flex items-center justify-center shrink-0">
             <div className="w-full h-full rounded-[9px] bg-gradient-to-b from-[#181D29] to-[#0A0D14] flex items-center justify-center relative overflow-hidden">
-              {customAvatar ? (
-                <img
-                  src={customAvatar}
-                  alt="Dra. Camila Andrade"
-                  className="w-full h-full object-cover object-top"
-                />
-              ) : (
-                <>
-                  <div className="absolute top-0 right-0 w-6 h-6 bg-[#C5A059]/20 rounded-full blur-xs pointer-events-none" />
-                  <span className="font-serif font-bold text-xs sm:text-sm text-transparent bg-clip-text bg-gradient-to-r from-[#FFFFFF] via-[#F5E6C8] to-[#C5A059] tracking-tighter select-none">
-                    CA
-                  </span>
-                </>
-              )}
+              <img
+                src={customAvatar || draCamilaPhoto}
+                alt="Dra. Camila Andrade"
+                className="w-full h-full object-cover object-top"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = draCamilaPhoto;
+                }}
+              />
             </div>
           </div>
 
@@ -215,15 +212,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
               <div className="pb-3 mb-3 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="relative w-8 h-8 rounded-lg bg-[#181D29] border border-[#C5A059]/40 flex items-center justify-center font-serif text-xs font-bold text-[#E9D5A1] overflow-hidden shrink-0">
-                    {customAvatar ? (
-                      <img
-                        src={customAvatar}
-                        alt="Dra. Camila Andrade"
-                        className="w-full h-full object-cover object-top"
-                      />
-                    ) : (
-                      <span>CA</span>
-                    )}
+                    <img
+                      src={customAvatar || draCamilaPhoto}
+                      alt="Dra. Camila Andrade"
+                      className="w-full h-full object-cover object-top"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = draCamilaPhoto;
+                      }}
+                    />
                   </div>
                   <div>
                     <span className="text-xs font-serif font-bold text-white block">

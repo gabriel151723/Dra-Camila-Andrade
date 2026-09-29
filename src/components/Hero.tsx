@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { ArrowRight, Star, ShieldCheck, Sparkles, Check, Gem, Shield, Instagram, Award, MapPin, Clock } from 'lucide-react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import draCamilaPhoto from '../assets/images/dra-camila.jpg';
 
 interface HeroProps {
   onOpenBooking: () => void;
@@ -9,13 +10,13 @@ interface HeroProps {
 export const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
   const heroRef = useRef<HTMLElement>(null);
 
-  // Persistent photo state (retains the exact photo the user attached in localStorage)
+  // Persistent photo state (defaults to bundled high-res photograph of Dra. Camila)
   const [photoSrc, setPhotoSrc] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('dracamila_hero_photo');
       if (saved) return saved;
     }
-    return '/foto pagina1.jpg';
+    return draCamilaPhoto;
   });
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -30,11 +31,9 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
         setImageLoaded(true);
       } else {
         const saved = localStorage.getItem('dracamila_hero_photo');
-        if (saved) {
-          setPhotoSrc(saved);
-          setImageError(false);
-          setImageLoaded(true);
-        }
+        setPhotoSrc(saved || draCamilaPhoto);
+        setImageError(false);
+        setImageLoaded(true);
       }
     };
 
@@ -208,8 +207,8 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
                       setImageError(false);
                     }}
                     onError={() => {
-                      if (photoSrc !== '/foto-pagina1.jpg') {
-                        setPhotoSrc('/foto-pagina1.jpg');
+                      if (photoSrc !== draCamilaPhoto) {
+                        setPhotoSrc(draCamilaPhoto);
                       } else {
                         setImageError(true);
                       }

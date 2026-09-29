@@ -35,7 +35,13 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       `\nAguardo confirmação de disponibilidade da agenda.`;
 
     const whatsappUrl = `https://wa.me/5571981121661?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    const link = document.createElement('a');
+    link.href = whatsappUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     setSubmitted(true);
   };
 

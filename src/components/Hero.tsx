@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { ArrowRight, Star, ShieldCheck, Sparkles, Check, Gem, Shield, Instagram, Award, MapPin, Clock } from 'lucide-react';
+import { ArrowRight, Star, ShieldCheck, Gem, Instagram, Award, MapPin } from 'lucide-react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import draCamilaPhoto from '../assets/images/dra-camila.jpg';
+import gentleCarePhoto from '../assets/images/gentle_care.jpg';
 
 interface HeroProps {
   onOpenBooking: () => void;
@@ -9,41 +9,16 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
   const heroRef = useRef<HTMLElement>(null);
-
-  // Persistent photo state (defaults to bundled high-res photograph of Dra. Camila)
-  const [photoSrc, setPhotoSrc] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('dracamila_hero_photo');
-      if (saved) return saved;
-    }
-    return draCamilaPhoto;
-  });
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [photoSrc, setPhotoSrc] = useState('/dra-camila.jpg');
   const [imageError, setImageError] = useState(false);
 
-  // Synchronize photo updates when uploaded from the top navbar CA button
   useEffect(() => {
-    const handlePhotoUpdate = (e: Event) => {
-      const customEvent = e as CustomEvent<string>;
-      if (customEvent.detail) {
-        setPhotoSrc(customEvent.detail);
-        setImageError(false);
-        setImageLoaded(true);
-      } else {
-        const saved = localStorage.getItem('dracamila_hero_photo');
-        setPhotoSrc(saved || draCamilaPhoto);
-        setImageError(false);
-        setImageLoaded(true);
-      }
+    const handleUpdate = () => {
+      setImageError(false);
+      setPhotoSrc('/dra-camila.jpg?v=' + Date.now());
     };
-
-    window.addEventListener('hero_photo_updated', handlePhotoUpdate);
-    window.addEventListener('storage', handlePhotoUpdate);
-
-    return () => {
-      window.removeEventListener('hero_photo_updated', handlePhotoUpdate);
-      window.removeEventListener('storage', handlePhotoUpdate);
-    };
+    window.addEventListener('dracamila_photo_saved', handleUpdate);
+    return () => window.removeEventListener('dracamila_photo_saved', handleUpdate);
   }, []);
 
   // Parallax tracking linked to Hero container
@@ -59,20 +34,16 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
     restDelta: 0.001,
   });
 
-  // Multi-plane parallax translation curves (Strictly Compositor / Transform only)
+  // Multi-plane parallax translation curves
   const bgGlowY = useTransform(smoothProgress, [0, 1], [0, 110]);
   const bgGlowScale = useTransform(smoothProgress, [0, 1], [1, 1.2]);
   const textColumnY = useTransform(smoothProgress, [0, 1], [0, 25]);
   const cardColumnY = useTransform(smoothProgress, [0, 1], [0, -40]);
-  const badgeFloating1Y = useTransform(smoothProgress, [0, 1], [0, -65]);
-  const badgeFloating2Y = useTransform(smoothProgress, [0, 1], [0, 45]);
-  const badgeFloating3Y = useTransform(smoothProgress, [0, 1], [0, -35]);
-  const badgeFloating4Y = useTransform(smoothProgress, [0, 1], [0, 30]);
 
   return (
     <section 
       ref={heroRef} 
-      className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden"
+      className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden max-w-full"
     >
       {/* Parallax Background Ambient Glows */}
       <motion.div 
@@ -93,7 +64,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
             className="lg:col-span-7 space-y-6 text-center lg:text-left"
           >
             
-            {/* Unboxed Metadata (Rule: No static pills!) */}
+            {/* Unboxed Metadata */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 text-xs font-mono tracking-wider">
               <span className="text-white font-bold tracking-widest uppercase flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#C5A059] shadow-[0_0_8px_#C5A059]" />
@@ -121,7 +92,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
               Harmonização facial com luminosidade vítrea, <strong className="text-[#E9D5A1] font-semibold">sem desgaste agressivo da estrutura dental sadia</strong> e em ambiente privativo no Itaigara, Salvador.
             </p>
 
-            {/* Proof Points Strip (Clean unboxed with icons strictly for affordance/proof) */}
+            {/* Proof Points Strip */}
             <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-y-2 gap-x-6 text-xs text-slate-300">
               <div className="flex items-center gap-1.5">
                 <div className="flex text-amber-400">
@@ -138,21 +109,10 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
                 <span>Protocolo Minimamente Invasivo</span>
               </div>
               <span className="hidden sm:inline text-slate-600" aria-hidden="true">·</span>
-              <div className="flex items-center gap-1.5 text-slate-300">
-                <Sparkles className="w-4 h-4 text-[#C5A059]" />
-                <span>Escultura em Sessão Única</span>
+              <div className="flex items-center gap-1.5 text-[#E9D5A1]">
+                <Gem className="w-4 h-4 text-[#C5A059]" />
+                <span>Resina Nanoparticulada Alemã</span>
               </div>
-              <span className="hidden sm:inline text-slate-600" aria-hidden="true">·</span>
-              <a
-                href="https://www.instagram.com/dracamilacandrade?stkn=cTRwbHBvZmRpZzhn"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-slate-300 hover:text-white group transition-colors"
-                title="Acompanhe casos reais no Instagram"
-              >
-                <Instagram className="w-4 h-4 text-[#E1306C] group-hover:scale-110 transition-transform" />
-                <span className="font-mono text-xs text-[#E9D5A1] group-hover:underline">@dracamilacandrade</span>
-              </a>
             </div>
 
             {/* CTA Group */}
@@ -181,7 +141,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
             </p>
           </motion.div>
 
-          {/* Right Column: 100% Dra. Camila Andrade Photo Card with Dedicated Strategic Bento Badges (Zero Overlap) */}
+          {/* Right Column: Dra. Camila Andrade Photo Card with Dedicated Strategic Bento Badges */}
           <div className="lg:col-span-5 relative">
             
             {/* Parallax Container */}
@@ -193,44 +153,20 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
               {/* Outer Ambient Glow */}
               <div className="absolute -inset-1 rounded-2xl bg-gradient-to-b from-[#C5A059]/30 via-white/5 to-transparent blur-xl pointer-events-none" />
 
-              {/* Main Photo Card: 100% Photo Visible Without Obstruction */}
+              {/* Main Photo Card - 100% Fixed & Production Ready */}
               <div className="relative bg-[#11141C] border border-[#C5A059]/40 rounded-2xl overflow-hidden shadow-2xl transition-all">
                 
-                {/* 100% Photo */}
                 <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] max-h-[520px] overflow-hidden bg-[#181D29]">
                   <img
-                    src={photoSrc}
+                    src={imageError ? gentleCarePhoto : photoSrc}
+                    onError={() => setImageError(true)}
                     alt="Dra. Camila Andrade - Cirurgiã-Dentista CRO-BA 31316"
                     className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-103"
-                    onLoad={() => {
-                      setImageLoaded(true);
-                      setImageError(false);
-                    }}
-                    onError={() => {
-                      if (photoSrc !== draCamilaPhoto) {
-                        setPhotoSrc(draCamilaPhoto);
-                      } else {
-                        setImageError(true);
-                      }
-                    }}
+                    loading="eager"
                   />
 
-                  {/* Fallback Screen only if photo fails to load */}
-                  {imageError && (
-                    <div className="absolute inset-0 bg-[#121622] flex flex-col items-center justify-center p-6 text-center">
-                      <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#C5A059] to-[#E9D5A1] p-1 mb-3">
-                        <div className="w-full h-full rounded-full bg-[#121622] flex items-center justify-center font-serif text-2xl font-bold text-[#E9D5A1]">
-                          CA
-                        </div>
-                      </div>
-                      <h4 className="text-lg font-serif font-bold text-white mb-1">
-                        Dra. Camila Andrade
-                      </h4>
-                      <p className="text-xs font-mono text-[#C5A059] mb-4">
-                        CRO-BA 31316 · Salvador
-                      </p>
-                    </div>
-                  )}
+                  {/* Gradient Overlay for Editorial Depth */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#090B0E]/95 via-[#090B0E]/20 to-transparent pointer-events-none" />
 
                   {/* Top Floating Glass Badge: Doctor Identification */}
                   <div className="absolute top-3.5 left-3.5 z-10 bg-[#090B0E]/85 backdrop-blur-md border border-[#C5A059]/40 px-3.5 py-1.5 rounded-full flex items-center gap-2 shadow-lg">
@@ -243,13 +179,24 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
                     </span>
                   </div>
 
+                  {/* Top Right Monogram Insignia */}
+                  <div className="absolute top-3.5 right-3.5 z-10 w-8 h-8 rounded-lg bg-[#090B0E]/80 backdrop-blur-md border border-[#C5A059]/40 flex items-center justify-center font-serif text-xs font-bold text-[#E9D5A1] shadow-lg">
+                    CA
+                  </div>
+
                   {/* Elegant bottom caption bar with zero obstruction */}
-                  <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-[#090B0E]/95 via-[#090B0E]/70 to-transparent">
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#C5A059] font-semibold block">
-                      Odontologia Estética & Biomimética
+                  <div className="absolute bottom-0 inset-x-0 p-5 bg-gradient-to-t from-[#090B0E] via-[#090B0E]/85 to-transparent">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059]" />
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#C5A059] font-semibold block">
+                        Odontologia Estética & Biomimética
+                      </span>
+                    </div>
+                    <span className="text-sm sm:text-base font-serif font-bold text-white block">
+                      Atendimento Autoral no Centro Médico Itaigara
                     </span>
-                    <span className="text-sm font-serif font-bold text-white block">
-                      Lentes em Resina Nanoparticulada no Itaigara
+                    <span className="text-xs text-slate-300 block mt-0.5">
+                      Facetas & Lentes em Resina Nanoparticulada sem desgaste
                     </span>
                   </div>
 

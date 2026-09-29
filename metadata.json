@@ -1,0 +1,6 @@
+{
+  "name": "Dra. Camila Andrade - Odontologia Estética & Lentes em Resina",
+  "description": "Clínica de odontologia estética de alto padrão no Itaigara, Salvador. Lentes em resina composta nanoparticulada, clareamento personalizado e simulação digital do sorriso sem desgaste dental agressivo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
